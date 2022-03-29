@@ -1,0 +1,11 @@
+target_sources(NeuAmpNetDemo
+    PRIVATE
+        PluginEditor.cpp
+        PluginProcessor.cpp
+        RotarySlider.cpp
+	    BypassButton.cpp
+        PluginEditor.h
+        PluginProcessor.h
+        Parameters.h
+        RotarySlider.h
+	    BypassButton.h)
