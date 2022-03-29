@@ -1,0 +1,8 @@
+[submodule "RTNeural"]
+	path = .\\RTNeural\\
+	url = git@github.com:jatinchowdhury18/RTNeural.git
+	branch = main
+[submodule "JUCE"]
+	path = .\\JUCE\\
+	url = git@github.com:juce-framework/JUCE.git
+	branch = master
