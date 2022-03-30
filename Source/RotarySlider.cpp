@@ -19,9 +19,9 @@ void RotarySlider::drawSlider(juce::Graphics& g, int x, int y, int width, int he
     using namespace juce;
     this->setPaintingIsUnclipped(true);
 
-    auto bounds = Rectangle<float>(x, y, width, height * 0.7);
+    auto bounds = Rectangle<float>(x, y, width, height);
 
-    g.setColour(juce::Colours::black);
+    g.setColour(juce::Colour(0xff252525));
     Path outline;
     float size = bounds.getHeight();
     outline.addEllipse(bounds.getCentreX() - size / 2.f, bounds.getY(), size, size);
@@ -29,7 +29,6 @@ void RotarySlider::drawSlider(juce::Graphics& g, int x, int y, int width, int he
 
 
     auto center = bounds.getCentre();
-    auto radius = 30.f;
 
     Path p;
 
@@ -37,13 +36,13 @@ void RotarySlider::drawSlider(juce::Graphics& g, int x, int y, int width, int he
 
 
     // Button
-    r.setLeft(center.getX() - 1.7);
-    r.setRight(center.getX() + 1.7);
+    float buttonWidth = width * 0.097f / 2.f; // Constants from the Reference Design
+    r.setLeft(center.getX() - buttonWidth);
+    r.setRight(center.getX() + buttonWidth);
     r.setTop(bounds.getY());
-    r.setBottom(center.getY());
+    r.setBottom(bounds.getY() + width * 0.21f);
 
     p.addRectangle(r);
-    p.addEllipse(center.getX() - radius / 2.f, center.getY() - radius / 2.f, radius, radius);
 
     jassert(rotaryStartAngle <= rotaryEndAngle);
 
@@ -51,32 +50,10 @@ void RotarySlider::drawSlider(juce::Graphics& g, int x, int y, int width, int he
 
     p.applyTransform(AffineTransform().rotated(sliderAngleInRadians, center.getX(), center.getY()));
 
-    g.setColour(Colours::darkgrey);
+    g.setColour(juce::Colour(0xffc4c4c4));
     g.fillPath(p);
 
-    g.setColour(Colours::antiquewhite);
-    for (int i = 0; i < 7; ++i)
-    {
-
-        Path indicator;
-        Rectangle<float> indRect;
-
-
-        indRect.setLeft(center.getX() - 1.2f);
-        indRect.setRight(center.getX() + 1.2f);
-        indRect.setTop(center.getY() - size / 2.f - 6.f);
-        indRect.setBottom(center.getY() - size / 2.f);
-        indicator.addRectangle(indRect);
-        float radians = rotaryStartAngle + ((float)i / 6.f) * (rotaryEndAngle - rotaryStartAngle);
-        indicator.applyTransform(AffineTransform().rotated(radians, center.getX(), center.getY()));
-        g.fillPath(indicator);
-    }
-
     this->setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    g.setColour(Colours::black);
-    g.setFont(10.f);
-    auto strWidth = g.getCurrentFont().getStringWidth(juce::String(this->getValue()));
-    g.drawSingleLineText(juce::String(this->getValue()), center.getX() - strWidth/2.f, center.getY() + 4.f);
 }
 
 void RotarySlider::paint(juce::Graphics& g)
@@ -90,7 +67,6 @@ void RotarySlider::paint(juce::Graphics& g)
 
     auto range = getRange();
 
-
     auto sliderBounds = getSliderBounds();
 
     this->drawSlider(g,
@@ -100,21 +76,6 @@ void RotarySlider::paint(juce::Graphics& g)
         valueToProportionOfLength(getValue()),
         startAngle,
         endAngle);
-
-
-    Font font(getTextHeight(), Font::FontStyleFlags::bold);
-    g.setFont(font);
-    auto strWidth = g.getCurrentFont().getStringWidth(getDisplayString());
-
-    auto bounds = getLocalBounds();
-    Rectangle<float> labelRect;
-
-    auto height = getTextHeight() + 4;
-    labelRect.setSize(strWidth + 4, height);
-    labelRect.setCentre(bounds.getCentreX(), bounds.getBottom() - height);
-
-    g.setColour(juce::Colours::black);
-    g.drawFittedText(getDisplayString(), labelRect.toNearestInt(), Justification::centred, 1);
 }
 
 juce::String RotarySlider::getDisplayString() const

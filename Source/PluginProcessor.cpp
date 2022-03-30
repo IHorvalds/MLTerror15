@@ -2,6 +2,10 @@
 #include "PluginEditor.h"
 #include <fstream>
 
+#ifndef CLIPPING_THRESHOLD
+    #define CLIPPING_THRESHOLD 0.6f
+#endif
+
 //==============================================================================
 NeuAmpNetProcessor::NeuAmpNetProcessor()
     : AudioProcessor(BusesProperties()
@@ -175,6 +179,17 @@ void NeuAmpNetProcessor::processBlock(juce::AudioBuffer<float>& buffer,
             if (this->_model_ptr != nullptr) // maybe it didn't load the model correctly??
             {
                 //float x_in[] = { (1.f / (float)getSampleRate()), x};
+
+                this->_weightedSampleDelaySignal = 0.6f * x + 0.4f * this->_weightedSampleDelaySignal;
+                if (this->_weightedSampleDelaySignal > CLIPPING_THRESHOLD)
+                {
+                    this->isClipping.set(true);
+                }
+                else
+                {
+                    this->isClipping.set(false);
+                }
+
                 x = this->_model_ptr->forward(&x);
             }
             float y_out = this->_output_level.processSample(x);
@@ -206,9 +221,8 @@ void NeuAmpNetProcessor::LoadModel(juce::File& model_weights)
 
 void NeuAmpNetProcessor::LoadModel()
 {
-    juce::MemoryInputStream defaultModelStream(default_models::_0_50_50_5modellstm1_json, default_models::_0_50_50_5modellstm1_jsonSize, false);
+    juce::MemoryInputStream defaultModelStream(assets::_0_50_50_5modellstm1_json, assets::_0_50_50_5modellstm1_jsonSize, false);
     auto model_weights = nlohmann::json::parse(defaultModelStream.readEntireStreamAsString().toStdString());
-    DBG(defaultModelStream.readEntireStreamAsString().toStdString());
 
     this->_model_ptr = RTNeural::json_parser::parseJson<float>(model_weights);
     this->_should_set_model = false;
@@ -283,7 +297,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout NeuAmpNetProcessor::CreatePa
     // Output Volume
     layout.add(std::make_unique<juce::AudioParameterFloat>(param_names[Parameters::k_output],
         param_names[Parameters::k_output],
-        juce::NormalisableRange<float>(-50.f, 10.f, 1.f, 3.75f),
+        juce::NormalisableRange<float>(-50.f, 10.f, .1f, 3.75f),
         0.f));
 
     return layout;

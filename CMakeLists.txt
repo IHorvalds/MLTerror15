@@ -27,6 +27,12 @@ juce_add_plugin(NeuAmpNetDemo
 
 juce_generate_juce_header(NeuAmpNetDemo)
 
+set(NAN_CLIPPING_THRESHOLD TRUE)
+
+if(NAN_CLIPPING_THRESHOLD)
+    add_compile_definitions(CLIPPING_THRESHOLD 0.3f)
+endif()
+
 
 # Add source to this project's executable.
 # add_executable (NeuAmpNetDemo2 "NeuAmpNetDemo2.cpp" "NeuAmpNetDemo2.h")
@@ -40,10 +46,12 @@ target_compile_definitions(NeuAmpNetDemo
         JUCE_VST3_CAN_REPLACE_VST2=0)
 
 juce_add_binary_data(NeuAmpBinaries 
-    NAMESPACE default_models
+    NAMESPACE assets
         SOURCES
             python/0.5-0.5-0.5-model-gru-4.json
             python/0.5-0.5-0.5-model-lstm-1.json
+            Source/Assets/UI/UIBlank.png
+            Source/Assets/UI/Switch.png
     )
 
 target_link_libraries(NeuAmpNetDemo

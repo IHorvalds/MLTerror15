@@ -60,12 +60,16 @@ public:
     juce::AudioProcessorValueTreeState m_apvts{ *this, nullptr, "Parameters", CreateParameterLayout() };
 
     void SetModelPath(juce::String s);
+
+    juce::Atomic<bool> isClipping = false;
 private:
 
     std::unique_ptr<Model> _model_ptr;
     //Oversampler os{ 2, 2, Oversampler::FilterType::filterHalfBandPolyphaseIIR };
     Gain _input_level, _output_level;
     bool _should_set_model = false;
+
+    float _weightedSampleDelaySignal = 0.f;
 
     void LoadModel(); // just load the default. 0.5g - 0.5t - 0.5v
     void LoadModel(juce::File& model_weights);
