@@ -4,9 +4,12 @@
 #include "PluginProcessor.h"
 #include "RotarySlider.h"
 #include "BypassButton.h"
+#include "PowerButton.h"
+#include "OnlyTextButton.h"
+#include "RotaryParameter.h"
 
 //==============================================================================
-class NeuAmpNetDemoEditor : public juce::AudioProcessorEditor
+class NeuAmpNetDemoEditor : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
     explicit NeuAmpNetDemoEditor(NeuAmpNetProcessor&);
@@ -21,15 +24,20 @@ private:
     // access the processor object that created it.
     NeuAmpNetProcessor& processor;
 
+    void timerCallback() override;
+
     using APVTS = juce::AudioProcessorValueTreeState;
     using SliderAttachment = APVTS::SliderAttachment;
     using ButtonAttachment = APVTS::ButtonAttachment;
 
     RotarySlider inputSlider, outputSlider;
     BypassButton bypassButton;
-    TextButton modelButton;
+    PowerButton powerButton;
+    OnlyTextButton modelButton;
     SliderAttachment inputAttachment, outputAttachment;
-    ButtonAttachment  bypassButtonAttachment;
+    ButtonAttachment  bypassButtonAttachment, powerButtonAttachment;
+
+    RotaryParameter gainParameter, toneParameter, volumeParameter;
 
     void ButtonClicked();
 
